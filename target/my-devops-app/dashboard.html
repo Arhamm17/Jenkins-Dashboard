@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DevOps Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 3rem;
+    }
+    h1  { color: #60a5fa; margin-bottom: 0.3rem; }
+    p.sub { color: #94a3b8; margin-bottom: 2rem; }
+    .cards {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 1.5rem 2rem;
+      min-width: 180px;
+      text-align: center;
+    }
+    .label { font-size: 0.75rem; color: #64748b;
+             text-transform: uppercase; letter-spacing: 0.1em; }
+    
+    .value { font-size: 1.8rem; font-weight: bold;
+             margin-top: 0.5rem; color: #f1f5f9; }
+    .SUCCESS { color: #4ade80; }
+    .FAILURE { color: #f87171; }
+    .BUILDING{ color: #60a5fa; }
+    button {
+      margin-top: 2rem;
+      padding: 0.6rem 2rem;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .err { color: #f87171; margin-top: 1rem; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <h1>DevOps Pipeline Dashboard</h1>
+  <p class="sub">Live data from Jenkins API</p>
+  <div class="cards">
+    <div class="card">
+      <div class="label">Build Status</div>
+      <div class="value" id="status">...</div>
+    </div>
+    <div class="card">
+      <div class="label">Build Number</div>
+      <div class="value" id="num">...</div>
+    </div>
+    <div class="card">
+      <div class="label">Deployed At</div>
+      <div class="value" style="font-size:1rem" id="time">...</div>
+    </div>
+  </div>
+  <button onclick="load()">Refresh</button>
+  <p class="err" id="err"></p>
+ 
+  <script>
+    // *** Change these three lines to match your setup ***
+    const JENKINS = 'http://YOUR-EC2-IP:8080';
+    const USER    = 'your-jenkins-username';
+    const TOKEN   = 'your-jenkins-api-token';   // see Section 8.3
+    const JOB     = 'my-pipeline';
+ 
+    async function load() {
+      document.getElementById('err').textContent = '';
+      try {
+        const r = await fetch(
+          `${JENKINS}/job/${JOB}/lastBuild/api/json`,
+          { headers: { 'Authorization': 'Basic ' + btoa(USER+':'+TOKEN) } }
+        );
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const d = await r.json();
+        const s = d.result || 'BUILDING';
+        const el = document.getElementById('status');
+        el.textContent = s;
+        el.className = 'value ' + s;
+        document.getElementById('num').textContent  = '#' + d.number;
+        document.getElementById('time').textContent =
+          new Date(d.timestamp).toLocaleString();
+      } catch(e) {
+        document.getElementById('err').textContent =
+          'Could not reach Jenkins: ' + e.message;
+      }
+    }
+load();
+    setInterval(load, 30000); // auto refresh every 30 seconds
+  </script>
+</body>
+</html>
