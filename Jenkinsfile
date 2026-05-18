@@ -8,7 +8,7 @@ pipeline {
  
     environment {
         APP_NAME   = 'myapp'
-        TOMCAT_DIR = '/var/lib/tomcat9/webapps'
+        TOMCAT_DIR = '/opt/tomcat9/webapps'
     }
  
     stages {
@@ -28,13 +28,9 @@ pipeline {
         stage('Deploy to Tomcat') {
             steps {
                 sh '''
-                    # Remove old version
                     rm -rf ${TOMCAT_DIR}/${APP_NAME}
-                    rm -f  ${TOMCAT_DIR}/${APP_NAME}.war
- 
-                    # Copy new WAR
+                    rm -f ${TOMCAT_DIR}/${APP_NAME}.war
                     cp target/*.war ${TOMCAT_DIR}/${APP_NAME}.war
- 
                     echo "Deployed build #${BUILD_NUMBER} at $(date)"
                 '''
             }
@@ -46,6 +42,7 @@ pipeline {
         success {
             echo "Build ${BUILD_NUMBER} deployed successfully!"
         }
+
         failure {
             echo "Build ${BUILD_NUMBER} failed — check the logs above"
         }
