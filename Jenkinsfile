@@ -28,9 +28,9 @@ pipeline {
         stage('Deploy to Tomcat') {
             steps {
                 sh '''
-                    rm -rf ${TOMCAT_DIR}/${APP_NAME}
-                    rm -f ${TOMCAT_DIR}/${APP_NAME}.war
-                    cp target/*.war ${TOMCAT_DIR}/${APP_NAME}.war
+                    sudo rm -rf ${TOMCAT_DIR}/${APP_NAME}
+                    sudo rm -f ${TOMCAT_DIR}/${APP_NAME}.war
+                    sudo cp target/*.war ${TOMCAT_DIR}/${APP_NAME}.war
                     echo "Deployed build #${BUILD_NUMBER} at $(date)"
                 '''
             }
