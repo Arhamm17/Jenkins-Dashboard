@@ -80,10 +80,7 @@
     async function load() {
       document.getElementById('err').textContent = '';
       try {
-        const r = await fetch(
-          `${JENKINS}/job/${JOB}/lastBuild/api/json`,
-          { headers: { 'Authorization': 'Basic ' + btoa(USER+':'+TOKEN) } }
-        );
+        const r = await fetch('jenkins-proxy.jsp');
         if (!r.ok) throw new Error('HTTP ' + r.status);
         const d = await r.json();
         const s = d.result || 'BUILDING';
