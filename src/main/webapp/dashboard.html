@@ -77,54 +77,46 @@
   const TOKEN   = '110371a0afa4f0584f13a13e7056e4a51e';
   const JOB     = 'devops-dashboard';
 
-  async function load() {
-    document.getElementById('err').textContent = '';
+async function load() {
+  document.getElementById('err').textContent = '';
 
-    try {
-      const r = await fetch('jenkins-proxy.jsp');
+  try {
+    const r = await fetch('jenkins-proxy.jsp');
 
-      if (!r.ok) throw new Error('HTTP ' + r.status);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
 
-      const d = await r.json();
+    let d = await r.text();
 
-      console.log("Jenkins API:", d);
+    console.log("RAW RESPONSE:", d);
 
-      // ✅ FIX 1: Correct status handling
-      let status;
+    // ✅ FIX: ensure JSON parsing
+    d = JSON.parse(d);
 
-      if (d.building === true) {
-        status = 'BUILDING';
-      } else {
-        status = d.result || 'UNKNOWN';
-      }
+    console.log("PARSED JSON:", d);
 
-      const el = document.getElementById('status');
-      el.textContent = status;
+    const status = d.building
+      ? 'BUILDING'
+      : (d.result || 'UNKNOWN');
 
-      // optional styling fix (safe class names)
-      el.className = 'value ' + status.toLowerCase();
+    document.getElementById('status').textContent = status;
 
-      // ✅ FIX 2: Build number (safe fallback)
-      document.getElementById('num').textContent =
-        '#' + (d.number ?? 'N/A');
+    document.getElementById('num').textContent =
+      '#' + (d.number ?? 'N/A');
 
-      // ✅ FIX 3: Timestamp handling
-      document.getElementById('time').textContent =
-        d.timestamp
-          ? new Date(d.timestamp).toLocaleString()
-          : 'N/A';
+    document.getElementById('time').textContent =
+      d.timestamp
+        ? new Date(d.timestamp).toLocaleString()
+        : 'N/A';
 
-    } catch (e) {
-      document.getElementById('err').textContent =
-        'Could not reach Jenkins: ' + e.message;
-    }
+  } catch (e) {
+    document.getElementById('err').textContent =
+      'Error: ' + e.message;
+    console.error(e);
   }
+}
 
-  // initial load
-  load();
-
-  // auto refresh (30 sec)
-  setInterval(load, 30000);
+load();
+setInterval(load, 5000); // 🔥 faster refresh for debugging
 </script>
 </body>
 </html>
