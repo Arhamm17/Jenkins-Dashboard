@@ -1,8 +1,8 @@
 <%@ page import="java.net.*,java.io.*" %>
 <%
-String jenkinsUrl = "http://localhost:8080/job/devops-dashboard/lastBuild/api/json";
+String jenkinsUrl = "http://13.62.172.73:8080/job/devops-dashboard/lastBuild/api/json";
 String username = "muhammadarhamrashid12";
-String token = "YOUR-NEW-API-TOKEN";
+String token = "110371a0afa4f0584f13a13e7056e4a51e";
 
 String auth = username + ":" + token;
 String encodedAuth = java.util.Base64.getEncoder().encodeToString(auth.getBytes());
