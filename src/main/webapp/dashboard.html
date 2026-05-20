@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>DevOps Dashboard</title>
+  <title>Jenkins Dashboard</title>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -13,14 +14,24 @@
       align-items: center;
       padding: 3rem;
     }
-    h1  { color: #60a5fa; margin-bottom: 0.3rem; }
-    p.sub { color: #94a3b8; margin-bottom: 2rem; }
+
+    h1 {
+      color: #60a5fa;
+      margin-bottom: 0.3rem;
+    }
+
+    p.sub {
+      color: #94a3b8;
+      margin-bottom: 2rem;
+    }
+
     .cards {
       display: flex;
       gap: 1.5rem;
       flex-wrap: wrap;
       justify-content: center;
     }
+
     .card {
       background: #1e293b;
       border: 1px solid #334155;
@@ -29,14 +40,33 @@
       min-width: 180px;
       text-align: center;
     }
-    .label { font-size: 0.75rem; color: #64748b;
-             text-transform: uppercase; letter-spacing: 0.1em; }
-    
-    .value { font-size: 1.8rem; font-weight: bold;
-             margin-top: 0.5rem; color: #f1f5f9; }
-    .SUCCESS { color: #4ade80; }
-    .FAILURE { color: #f87171; }
-    .BUILDING{ color: #60a5fa; }
+
+    .label {
+      font-size: 0.75rem;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .value {
+      font-size: 1.8rem;
+      font-weight: bold;
+      margin-top: 0.5rem;
+      color: #f1f5f9;
+    }
+
+    .SUCCESS {
+      color: #4ade80;
+    }
+
+    .FAILURE {
+      color: #f87171;
+    }
+
+    .BUILDING {
+      color: #60a5fa;
+    }
+
     button {
       margin-top: 2rem;
       padding: 0.6rem 2rem;
@@ -47,76 +77,90 @@
       cursor: pointer;
       font-size: 1rem;
     }
-    .err { color: #f87171; margin-top: 1rem; font-size: 0.9rem; }
+
+    .err {
+      color: #f87171;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
   </style>
 </head>
+
 <body>
-  <h1>DevOps Pipeline Dashboard</h1>
+
+  <h1>Jenkins Dashboard</h1>
   <p class="sub">Live data from Jenkins API</p>
+
   <div class="cards">
+
     <div class="card">
       <div class="label">Build Status</div>
       <div class="value" id="status">...</div>
     </div>
+
     <div class="card">
       <div class="label">Build Number</div>
       <div class="value" id="num">...</div>
     </div>
+
     <div class="card">
       <div class="label">Deployed At</div>
       <div class="value" style="font-size:1rem" id="time">...</div>
     </div>
+
   </div>
+
   <button onclick="load()">Refresh</button>
+
   <p class="err" id="err"></p>
- 
+
   <script>
-  // *** Your config (kept for future use if needed) ***
-  const JENKINS = 'http://13.62.172.73:8080';
-  const USER    = 'muhammadarhamrashid';
-  const TOKEN   = '11029dfa3917cb31138a1e30a36fc316ee';
-  const JOB     = 'devops-dashboard';
+    const JENKINS = 'http://13.62.172.73:8080';
+    const USER    = 'muhammadarhamrashid';
+    const TOKEN   = '11029dfa3917cb31138a1e30a36fc316ee';
+    const JOB     = 'devops-dashboard';
 
-async function load() {
-  document.getElementById('err').textContent = '';
+    async function load() {
+      document.getElementById('err').textContent = '';
 
-  try {
-    const r = await fetch('jenkins-proxy.jsp');
+      try {
+        const r = await fetch('jenkins-proxy.jsp');
 
-    if (!r.ok) throw new Error('HTTP ' + r.status);
+        if (!r.ok) throw new Error('HTTP ' + r.status);
 
-    let d = await r.text();
+        let d = await r.text();
 
-    console.log("RAW RESPONSE:", d);
+        console.log("RAW RESPONSE:", d);
 
-    // ✅ FIX: ensure JSON parsing
-    d = JSON.parse(d);
+        // ✅ FIX: ensure JSON parsing
+        d = JSON.parse(d);
 
-    console.log("PARSED JSON:", d);
+        console.log("PARSED JSON:", d);
 
-    const status = d.building
-      ? 'BUILDING'
-      : (d.result || 'UNKNOWN');
+        const status = d.building
+          ? 'BUILDING'
+          : (d.result || 'UNKNOWN');
 
-    document.getElementById('status').textContent = status;
+        document.getElementById('status').textContent = status;
 
-    document.getElementById('num').textContent =
-      '#' + (d.number ?? 'N/A');
+        document.getElementById('num').textContent =
+          '#' + (d.number ?? 'N/A');
 
-    document.getElementById('time').textContent =
-      d.timestamp
-        ? new Date(d.timestamp).toLocaleString()
-        : 'N/A';
+        document.getElementById('time').textContent =
+          d.timestamp
+            ? new Date(d.timestamp).toLocaleString()
+            : 'N/A';
 
-  } catch (e) {
-    document.getElementById('err').textContent =
-      'Error: ' + e.message;
-    console.error(e);
-  }
-}
+      } catch (e) {
+        document.getElementById('err').textContent =
+          'Error: ' + e.message;
+        console.error(e);
+      }
+    }
 
-load();
-setInterval(load, 5000); // 🔥 faster refresh for debugging
-</script>
+    load();
+    setInterval(load, 5000);
+  </script>
+
 </body>
 </html>
